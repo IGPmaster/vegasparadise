@@ -96,7 +96,7 @@
             <p v-html="text.Html"></p>
           </div>
           <div class="flex items-center justify-center">
-            <img src="../static/vegasparadiseLogo.png" loading="lazy" alt="Hippozino Casino footer Logo"
+            <img src="../static/vegasparadise.webp" loading="lazy" alt="Vegas Paradise footer Logo"
               class="footer_logo p-5 shadow-md rounded-lg" height="" width="" />
           </div>
         </div>

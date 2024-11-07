@@ -31,7 +31,7 @@
           </div>
           <div class="">
             <NuxtLink class="flex justify-center" to="/">
-              <img src="../static/vegasparadiseLogo.png" alt="Hippozino Casino header Logo" class="" width="200" height="">
+              <img src="../static/vegasparadise.webp" alt="Vegas Paradise header Logo" class="" width="200" height="">
             </NuxtLink>
           </div>
 
