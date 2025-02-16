@@ -5,7 +5,7 @@
             <div class="px-4">
                 <NuxtLink to="/compliance" class="flex justify-center gap-4 p-2 border rounded border-primary text-gray-800 text-center w-1/2 md:w-1/5 cursor-pointer">
                     <i class="material-icons">arrow_back</i>
-                    {{ msgTranslate.legal }}
+                    {{ msgTranslate?.legal || 'Legal' }}
                       </NuxtLink>
                 <div class="">
                     <div v-html="htmlContent"></div>
@@ -19,7 +19,7 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import { ref } from 'vue';
-import { msgTranslate, globalContent, loadTranslations } from '~/composables/globalData';
+import { msgTranslate, globalContent, loadTranslations, loadLang } from '~/composables/globalData';
 
 const route = useRoute();
 const slug = route.params.slug;
@@ -40,8 +40,19 @@ async function fetchContent(slug) {
 const htmlContent = ref('');
 
 (async () => {
-    htmlContent.value = await fetchContent(slug); // Set the htmlContent.value here
-    await loadTranslations();
+    try {
+        await useAsyncData('translations', async () => {
+            try {
+                await loadLang();
+            } catch (error) {
+                console.error('Error loading translations:', error);
+            }
+        });
+        htmlContent.value = await fetchContent(slug);
+        await loadTranslations();
+    } catch (error) {
+        console.error('Error in compliance page setup:', error);
+    }
 })();
 
 const handleClick = async (key) => {

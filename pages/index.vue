@@ -52,12 +52,23 @@
 import { ref, onMounted, defineEmits } from 'vue';
 const loading = ref(true);
 
-import { promotionsPosts, regLink, fetchPromotions } from '~/composables/globalData';
+import { promotionsPosts, regLink, fetchPromotions, loadLang } from '~/composables/globalData';
 
 const emit = defineEmits(['loaded']);
 
 const { fetch, error, $fetchState } = useFetch(async () => {
-	await fetchApiPromotions();
+	try {
+		await useAsyncData('translations', async () => {
+			try {
+				await loadLang();
+			} catch (error) {
+				console.error('Error loading translations:', error);
+			}
+		});
+		await fetchApiPromotions();
+	} catch (error) {
+		console.error('Error in index page setup:', error);
+	}
 });
 
 onMounted(async () => {
