@@ -88,6 +88,11 @@
             <li>
               <NuxtLink to="/compliance/terms" class="compliance-btn">{{ msgTranslate?.terms || 'Terms' }}</NuxtLink>
             </li>
+               <li>
+     <button @click="handleOpenPreferences" class="compliance-btn">
+       {{ msgTranslate?.cookie_settings || 'Cookie Settings' }}
+     </button>
+   </li>
           </ul>
           <div v-for="icon in footerIcons" :key="icon.Name">
             <div v-html="icon.Html"></div>
@@ -96,7 +101,7 @@
             <p v-html="text.Html"></p>
           </div>
           <div class="flex items-center justify-center">
-            <img src="../static/vegasparadise.webp" loading="lazy" alt="Vegas Paradise footer Logo"
+            <img src="/vegasparadise.webp" loading="lazy" alt="Vegas Paradise footer Logo"
               class="footer_logo p-5 shadow-md rounded-lg" height="" width="" />
           </div>
         </div>
@@ -124,7 +129,8 @@
 </template>
 
 <script setup>
-
+   import { useCookieConsent } from '~/composables/useCookieConsent';
+   const { handleOpenPreferences } = useCookieConsent();
 import { ref, onMounted } from 'vue';
 
 import { fetchFooterIcons, fetchFooterText, msgTranslate, loadLang } from '~/composables/globalData.js';
