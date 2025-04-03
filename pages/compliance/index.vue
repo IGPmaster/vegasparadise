@@ -5,12 +5,12 @@
                 <div class="g-btn-wrapper mt-10 md:mt-20 flex flex-wrap justify-center">
                     <button v-for="(value, key) in globalContent" :key="key" @click="handleClick(key)"
                         class="h-10 px-4 md:px-8 m-2 text-gray-100 transition-colors duration-150 bg-gray-700 rounded-lg focus:shadow-outline hover:bg-gray-800 uppercase text-xs md:text-base">
-                        {{ msgTranslate?.[value] || value }}
+                        {{ msgTranslate[value] ? msgTranslate[value] : value }}
                     </button>
                 </div>
 
                 <div class="px-4">
-                    <div v-html="htmlContent"></div>
+                    <div class="compliance text-black" v-html="htmlContent"></div>
                 </div>
             </div>
         </div>
@@ -38,24 +38,13 @@ async function fetchContent(code) {
 }
 
 import { ref } from 'vue';
-import { msgTranslate, globalContent, loadTranslations, loadLang } from '~/composables/globalData';
+import { msgTranslate, globalContent } from '~/composables/globalData';
 
 const htmlContent = ref('');
 
 (async () => {
-    try {
-        await useAsyncData('translations', async () => {
-            try {
-                await loadLang();
-            } catch (error) {
-                console.error('Error loading translations:', error);
-            }
-        });
-        htmlContent.value = await fetchContent('aboutus');
-        await loadTranslations();
-    } catch (error) {
-        console.error('Error in compliance page setup:', error);
-    }
+    htmlContent.value = await fetchContent('aboutus'); // Set the htmlContent.value here
+
 })();
 
 const handleClick = async (key) => {
@@ -64,4 +53,6 @@ const handleClick = async (key) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>

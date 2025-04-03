@@ -3,12 +3,12 @@
         <div class="">
             <div class="container mx-auto bg-white pt-32">
             <div class="px-4">
-                <NuxtLink to="/compliance" class="flex justify-center gap-4 p-2 border rounded border-primary text-gray-800 text-center w-1/2 md:w-1/5 cursor-pointer">
+                <NuxtLink to="/compliance/" class="flex justify-center gap-4 p-2 border rounded border-primary text-gray-800 text-center w-1/2 md:w-1/5 cursor-pointer">
                     <i class="material-icons">arrow_back</i>
-                    {{ msgTranslate?.legal || 'Legal' }}
+                    {{ msgTranslate.legal }}
                       </NuxtLink>
                 <div class="">
-                    <div v-html="htmlContent"></div>
+                    <div class="text-black" v-html="htmlContent"></div>
                 </div>
                 </div>
             </div>
@@ -19,7 +19,7 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import { ref } from 'vue';
-import { msgTranslate, globalContent, loadTranslations, loadLang } from '~/composables/globalData';
+import { msgTranslate, globalContent, loadTranslations } from '~/composables/globalData';
 
 const route = useRoute();
 const slug = route.params.slug;
@@ -28,7 +28,7 @@ async function fetchContent(slug) {
     try {
         const response = await fetch(
             `${PP_API_URL}GetInfoContentByCode?whitelabelId=${WHITELABEL_ID}&country=${lang.value}&code=${slug}`
-            //`http://content.progressplay.net/api23/api/InfoContent?whitelabelId=&country=en&Code=${slug}`
+            //`http://content.progressplay.net/api23/api/GetInfoContentByCode?whitelabelId=10&country=en&Code=${slug}`
         );
         const data = await response.json();
         return data[0].Html; // Return the Html content instead of updating the ref
@@ -40,19 +40,8 @@ async function fetchContent(slug) {
 const htmlContent = ref('');
 
 (async () => {
-    try {
-        await useAsyncData('translations', async () => {
-            try {
-                await loadLang();
-            } catch (error) {
-                console.error('Error loading translations:', error);
-            }
-        });
-        htmlContent.value = await fetchContent(slug);
-        await loadTranslations();
-    } catch (error) {
-        console.error('Error in compliance page setup:', error);
-    }
+    htmlContent.value = await fetchContent(slug); // Set the htmlContent.value here
+    await loadTranslations();
 })();
 
 const handleClick = async (key) => {
@@ -61,4 +50,8 @@ const handleClick = async (key) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.content-area h1 {
+    font-weight: bold !important;
+}
+</style>
