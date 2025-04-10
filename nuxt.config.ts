@@ -1,6 +1,7 @@
 export default defineNuxtConfig({
   // Keep SSR true for Cloudflare Pages
   ssr: true,
+
   nitro: {
     preset: 'cloudflare-pages',
     output: {
@@ -13,21 +14,27 @@ export default defineNuxtConfig({
       routes: ['/']         // Add this to ensure root is prerendered
     }
   },
+
   // Use ISR (Incremental Static Regeneration) for all routes
   routeRules: {
     '/**': { isr: true }
   },
+
   // Add this experimental feature for better Cloudflare Pages compatibility
   experimental: {
     payloadExtraction: false
   },
+
   css: ['~/assets/main.css'],
+
   plugins: [
     '~/plugins/language.js',
     '~/plugins/hreflang.js',
     '~/plugins/vue-gtm.client.js',
   ],
+
   modules: ['@nuxtjs/tailwindcss'],
+
   app: {
     head: {
       title: 'VegasParadise - Your Casino!',
@@ -43,4 +50,6 @@ export default defineNuxtConfig({
       ],
     }
   },
+
+  compatibilityDate: '2025-04-03',
 });
