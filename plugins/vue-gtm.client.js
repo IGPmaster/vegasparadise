@@ -37,6 +37,15 @@ export default defineNuxtPlugin((nuxtApp) => {
         // Function to initialize GTM
         window.initializeGTM = () => {
             try {
+                // Check if GTM is already loaded to prevent duplicates
+                const scriptExists = Array.from(document.getElementsByTagName('script'))
+                    .some(script => script.src && script.src.includes('googletagmanager.com/gtm.js'));
+                
+                if (scriptExists) {
+                    console.log('GTM script already loaded, skipping initialization');
+                    return;
+                }
+                
                 // Load GTM script
                 const script = document.createElement('script');
                 script.async = true;

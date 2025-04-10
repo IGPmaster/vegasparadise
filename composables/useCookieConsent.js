@@ -57,7 +57,7 @@ export function useCookieConsent() {
     // Always check URL for tracker first
     let finalTracker = urlParams.get('tracker');
     
-    // If no URL tracker, use passed tracker or cookie tracker (always, since it's necessary)
+    // If no URL tracker, use passed tracker or cookie tracker
     if (!finalTracker) {
         finalTracker = tracker || getCookie('affiliateTracker');
     }
@@ -77,8 +77,15 @@ export function useCookieConsent() {
   };
 
   const setAffiliateTracking = (tracker) => {
-    // Since affiliate tracking is now necessary, we don't check for consent
-    if (!tracker) {
+    // Check URL for tracker parameter first (this ensures URL takes precedence)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlTracker = urlParams.get('tracker');
+    
+    // Use URL tracker if available, otherwise use the passed tracker
+    const finalTracker = urlTracker || tracker;
+    
+    // Update links with the final tracker
+    if (!finalTracker) {
         updateLobbyLinks(null);
         return;
     }
@@ -86,8 +93,8 @@ export function useCookieConsent() {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 30);
     
-    document.cookie = `affiliateTracker=${tracker}; max-age=${30*24*60*60}; path=/; SameSite=Strict; Secure`;
-    updateLobbyLinks(tracker);
+    document.cookie = `affiliateTracker=${finalTracker}; max-age=${30*24*60*60}; path=/; SameSite=Strict; Secure`;
+    updateLobbyLinks(finalTracker);
   };
 
   const clearAnalyticsCookies = () => {
@@ -232,12 +239,16 @@ export function useCookieConsent() {
       version: '1.0'
     }));
 
-    // Always handle affiliate tracking since it's necessary
+    // Handle affiliate tracking (URL parameters take precedence)
     const urlTracker = getTrackerFromURL();
-    const trackerToUse = urlTracker || pendingTracker.value;
-    if (trackerToUse) {
-      setAffiliateTracking(trackerToUse);
+    if (urlTracker) {
+      // If URL has tracker, always use it (URL takes precedence)
+      setAffiliateTracking(urlTracker);
+    } else if (pendingTracker.value) {
+      // Otherwise use pending tracker if available
+      setAffiliateTracking(pendingTracker.value);
     } else {
+      // Fallback to existing cookie tracker
       const existingTracker = getCookie('affiliateTracker');
       updateLobbyLinks(existingTracker);
     }
