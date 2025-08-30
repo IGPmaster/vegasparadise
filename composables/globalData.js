@@ -166,11 +166,25 @@ export async function loadLang() {
       if (foundLangKV && foundLangIGP) {
         console.log('🌍 LANG: Country', originalLang, 'is supported, using it');
         langValue = originalLang;
+        
+        // Store globally for Playtech filtering - this is a REAL/SUPPORTED country
+        if (typeof window !== 'undefined') {
+          window.__isRealCountry = true;
+          window.__originalDetectedCountry = originalLang;
+          console.log('🇨🇦 PLAYTECH: Real CA detected - Playtech games will be filtered');
+        }
       } else {
         // Use proper EU fallback logic instead of hardcoded CA
         const fallbackCountry = getFallbackCountry(workerData);
         console.log('🌍 LANG: Country', originalLang, 'not supported, falling back to', fallbackCountry);
         langValue = fallbackCountry;
+        
+        // Store globally for Playtech filtering - this is a FALLBACK country
+        if (typeof window !== 'undefined') {
+          window.__isRealCountry = false;
+          window.__originalDetectedCountry = originalLang;
+          console.log('🇨🇦 PLAYTECH: Fallback CA detected - Playtech games will be included');
+        }
       }
     } catch (error) {
       console.error('🌍 LANG: Error getting country code:', error);
@@ -436,7 +450,28 @@ async function actuallyFetchGames() {
       const isExcludedJurisdiction = game.excludedJurisdictions?.includes(jurisdictionCode.value);
       const isExcludedCountry = game.excludedCountries?.includes(lang.value);
 
-      return !(hasName || hasId || isExcludedJurisdiction || isExcludedCountry);
+      // PLAYTECH FILTERING FOR REAL CA USERS
+      let isPlaytechExcluded = false;
+      if (lang.value === 'CA') {
+        // Get real country detection info from window global (set during loadLang)
+        const isRealCountry = (typeof window !== 'undefined') ? window.__isRealCountry : true;
+        const originalDetectedCountry = (typeof window !== 'undefined') ? window.__originalDetectedCountry : lang.value;
+        
+        if (isRealCountry && originalDetectedCountry === 'CA') {
+          // This is a REAL CA user (not fallback) - filter Playtech
+          const isPlaytech = game.provider?.toLowerCase() === 'playtech' || 
+                            game.subProvider?.toLowerCase() === 'playtech';
+          if (isPlaytech) {
+            console.log('🇨🇦 PLAYTECH: Filtering out Playtech game for real CA:', game.gameName);
+            isPlaytechExcluded = true;
+          }
+        } else {
+          // This is a FALLBACK CA user (non-EU country falling back to CA) - include Playtech
+          console.log('🇨🇦 PLAYTECH: Fallback CA user - Playtech games included');
+        }
+      }
+
+      return !(hasName || hasId || isExcludedJurisdiction || isExcludedCountry || isPlaytechExcluded);
     });
 
     games.value = filteredGames;
