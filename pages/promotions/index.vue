@@ -30,10 +30,10 @@
                         class="w-full md:w-3/6 text-center py-4 mt-2 px-8 text-gray-100 transition-colors duration-150 bg-gray-700 rounded-lg focus:shadow-outline hover:bg-gray-800 uppercase">
                         {{ msgTranslate?.see_more || 'See More' }}
                     </a>
-                <div v-if="promo.disclaimer !== null">
+                    <div v-if="promo.disclaimer !== null">
                         <span v-html="promo.disclaimer" class="text-sm/[12px] py-5 text-slate-800/75"></span>
                         <span class="text-sm/[12px] py-5 text-slate-800/75">
-                            <a :href="'https://hippozino.casino-pp.net/promotions?code=' + promo.code" 
+                            <a :href="'https://vegasparadise.casino-pp.net/promotions?code=' + promo.code" 
                                 class="no_underline"
                                 target="_blank" 
                                 rel="noopener noreferrer">
@@ -41,6 +41,7 @@
                             </a>
                         </span>
                     </div>
+                </div>
             </div>
         </div>
         
