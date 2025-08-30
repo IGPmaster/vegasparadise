@@ -10,7 +10,18 @@
                 </div>
 
                 <div class="px-4">
-                    <div class="compliance text-black" v-html="htmlContent"></div>
+                    <!-- Loading State -->
+                    <div v-if="loading" class="text-center py-10">
+                        <p class="text-gray-600">Loading content...</p>
+                    </div>
+                    
+                    <!-- Error State -->
+                    <div v-else-if="error" class="text-center py-10">
+                        <p class="text-red-600">Error loading content. Please try again later.</p>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div v-else class="compliance text-black" v-html="htmlContent"></div>
                 </div>
             </div>
         </div>
@@ -19,37 +30,50 @@
 
 
 <script setup>
+import { ref, onMounted } from 'vue';
+import { msgTranslate, globalContent, loadLang, fetchCachedContent } from '~/composables/globalData';
 
-function updateCode(key, globalContent) {
-    const code = globalContent[key];
-    return code; // Return the code value
-}
+const htmlContent = ref('');
+const loading = ref(true);
+const error = ref(null);
+const activeSection = ref('aboutus');
 
-async function fetchContent(code) {
+// Use new fetchCachedContent function with KV caching
+async function loadContent(contentCode) {
     try {
-        const response = await fetch(
-            `${PP_API_URL}GetInfoContentByCode?whitelabelId=${WHITELABEL_ID}&country=${lang.value}&code=${code}`
-        );
-        const data = await response.json();
-        return data[0].Html; // Return the Html content instead of updating the ref
-    } catch (error) {
-        console.error(error);
+        loading.value = true;
+        console.log('📄 COMPLIANCE INDEX: Loading content for', contentCode);
+        
+        // Use the optimized fetchCachedContent function
+        const content = await fetchCachedContent(contentCode);
+        htmlContent.value = content;
+        activeSection.value = contentCode;
+        
+        console.log('✅ COMPLIANCE INDEX: Content loaded successfully');
+    } catch (err) {
+        console.error('❌ COMPLIANCE INDEX: Error loading content:', err);
+        error.value = err;
+        htmlContent.value = '<p>Error loading content. Please try again later.</p>';
+    } finally {
+        loading.value = false;
     }
 }
 
-import { ref } from 'vue';
-import { msgTranslate, globalContent } from '~/composables/globalData';
-
-const htmlContent = ref('');
-
-(async () => {
-    htmlContent.value = await fetchContent('aboutus'); // Set the htmlContent.value here
-
-})();
+// Load initial content on component mount
+onMounted(async () => {
+    try {
+        await loadLang(); // Ensure language is loaded first
+        await loadContent('aboutus'); // Load default content
+    } catch (err) {
+        console.error('❌ COMPLIANCE INDEX: Error in component setup:', err);
+        error.value = err;
+        loading.value = false;
+    }
+});
 
 const handleClick = async (key) => {
-    const code = updateCode(key, globalContent.value); // Use globalContent.value here
-    htmlContent.value = await fetchContent(code);
+    const code = globalContent[key];
+    await loadContent(code);
 };
 </script>
 

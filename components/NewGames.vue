@@ -82,25 +82,23 @@
 <script setup>
 import { ref, onMounted, defineEmits } from 'vue';
 const loading = ref(true);
-import { newGames, msgTranslate, regLink, loginLink, loadLang } from '~/composables/globalData';
+import { newGames, msgTranslate, regLink, loginLink, loadLang, fetchGames } from '~/composables/globalData';
 
 const emit = defineEmits(['loaded']);
 
-onMounted(async () => {
+// Single call for both SSR and client (OPTIMIZATION: Remove duplicate fetchGames() call)
+await useAsyncData('new-game-component-data', async () => {
     try {
-        await useAsyncData('translations', async () => {
-            try {
-                await loadLang();
-            } catch (error) {
-                console.error('Error loading translations:', error);
-            }
-        });
-        await fetchGames();
+        await loadLang();
+        await fetchGames(); // ✅ Only call needed
     } catch (error) {
-        console.error('Error fetching promotions:', error);
-    } finally {
-        loading.value = false;
-        emit('loaded');
+        console.error('Error loading new games data:', error);
     }
+});
+
+onMounted(() => {
+    // No API call, just UI state (OPTIMIZATION: Prevent duplicate calls)
+    loading.value = false;
+    emit('loaded');
 });
 </script>

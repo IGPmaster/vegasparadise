@@ -28,10 +28,15 @@ export const globalContent = ref({
 
 // ProgressPlay data:
 export const WHITELABEL_ID = 26;
-export const PP_API_URL = 'https://prd-api.casino-pp.net/CmSHelper/';
-const PP_PROMOTIONS_API = `${PP_API_URL}GetPromotionsInfo?whitelabelId=${WHITELABEL_ID}&country=`;
+export const PP_API_URL = 'https://content.progressplay.net/api23/api/';
+const PP_PROMOTIONS_API = `${PP_API_URL}PromotionsInfo?whitelabelId=${WHITELABEL_ID}&country=`;
 export const PP_LOBBY_LINK = 'https://vegasparadise.casino-pp.net/';
-const KV_GAMES = `https://content.progressplay.net/api23/api/game?whitelabelId=${WHITELABEL_ID}`; // Test API
+
+// SILVER BULLET VPN FIX: Use LOCAL CloudFlare Functions for VPN compatibility
+const KV_GAMES_PRIMARY = '/api/pp/games';           // LOCAL function (same-origin)
+const KV_GAMES_FALLBACK = '/api/worker/games';      // LOCAL fallback
+const KV_GAMES_EXTERNAL = 'https://access-ppgames.tech1960.workers.dev/'; // External fallback
+const KV_GAMES = KV_GAMES_PRIMARY;
 
 
 // WP-REST-API:
@@ -70,6 +75,25 @@ const country = ref('');
 const countryNotSupported = ref(false);
 const countriesData = ref([]);
 
+// Cache optimization variables to prevent CPU time limit errors
+let gamesCache = null;
+let gamesCacheTime = 0;
+let gamesRequestInFlight = null; // Prevent simultaneous requests
+let contentCache = new Map(); // Cache for compliance content
+const footerContentCache = new Map();
+
+// Optimized cache durations
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes for promotions
+const GAMES_CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours for games (rarely change)
+const CONTENT_CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 hours for compliance content (very rarely changes)
+
+// EU Countries array for proper fallback logic
+const EU_COUNTRIES = [
+  'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 
+  'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 
+  'SI', 'ES', 'SE', 'GB'  // Include UK as well
+];
+
 export async function checkCountry() {
   try {
     const workerResponse = await fetch(CF_GEO_WORKER);
@@ -85,6 +109,36 @@ export async function checkCountry() {
   }
 }
 
+// EU Country Fallback Fix - Get fallback country based on continent
+function getFallbackCountry(geoData) {
+  if (!geoData) {
+    console.log('🌍 FALLBACK: No geo data, defaulting to CA');
+    return 'CA';
+  }
+
+  const { countryCode, continent } = geoData;
+  console.log('🌍 FALLBACK: Processing fallback for', countryCode, 'continent:', continent);
+
+  // Primary check: Use continent data from CloudFlare
+  if (continent === 'EU') {
+    console.log('🌍 FALLBACK: EU continent detected, using IE');
+    return 'IE';
+  }
+
+  // Backup check: If continent data is missing, check against EU countries array
+  if (!continent || continent === 'Unknown') {
+    console.log('🌍 FALLBACK: No continent data, checking EU countries array');
+    if (EU_COUNTRIES.includes(countryCode)) {
+      console.log('🌍 FALLBACK: Found', countryCode, 'in EU countries array, using IE');
+      return 'IE';
+    }
+  }
+
+  // Default fallback for non-EU countries
+  console.log('🌍 FALLBACK: Non-EU country, using CA');
+  return 'CA';
+}
+
 export async function loadLang() {
   if (typeof window !== 'undefined') {
     let langValue;
@@ -94,6 +148,9 @@ export async function loadLang() {
       const workerResponse = await fetch(CF_GEO_WORKER);
       const workerData = await workerResponse.json();
       const originalLang = workerData.countryCode;
+      
+      console.log('🌍 LANG: Detected country:', originalLang);
+      console.log('🌍 LANG: Continent:', workerData.continent);
 
       // 2:1 Verify value with KV_SUPPORTED_COUNTRIES
       const apiResponse = await fetch(KV_SUPPORTED_COUNTRIES);
@@ -107,13 +164,17 @@ export async function loadLang() {
 
       // Check if the originalLang exists in both KV's
       if (foundLangKV && foundLangIGP) {
+        console.log('🌍 LANG: Country', originalLang, 'is supported, using it');
         langValue = originalLang;
       } else {
-        // If the country is not found in both KV's, set fallback to 'CA'
-        langValue = 'CA';
+        // Use proper EU fallback logic instead of hardcoded CA
+        const fallbackCountry = getFallbackCountry(workerData);
+        console.log('🌍 LANG: Country', originalLang, 'not supported, falling back to', fallbackCountry);
+        langValue = fallbackCountry;
       }
     } catch (error) {
-      console.error('Error getting country code:', error);
+      console.error('🌍 LANG: Error getting country code:', error);
+      langValue = 'CA'; // Ultimate fallback
     }
 
     // 2:2 Check if lang cookie exists
@@ -138,6 +199,8 @@ export async function loadLang() {
 
     // Fetch the country data based on the selected language
     await fetchCountry();
+    
+    console.log('🌍 LANG: Final language set to:', lang.value);
   }
 }
 
@@ -188,14 +251,45 @@ export async function loadTranslations() {
   }
 }
 
+// UNIFIED PROMOTIONS API with local function for VPN compatibility
 async function fetchApiPromotions() {
   try {
-    const response = await fetch(`${PP_API_URL}GetPromotionsInfo?whitelabelId=${WHITELABEL_ID}&country=${lang.value}`);
-    const data = await response.json();
-    pp_promotions.value = data;
-    //console.log('this.pp_promotions 123: ', pp_promotions.value);
+    console.log('🎁 PROMOTIONS: Starting fetchApiPromotions()');
+    console.log('🔍 PROMOTIONS: lang.value =', lang.value);
+    console.log('🔍 PROMOTIONS: WHITELABEL_ID =', WHITELABEL_ID);
+    console.log('🔍 PROMOTIONS: process.client =', process.client);
+    
+    // Use local CloudFlare Function for client-side calls (VPN compatibility), direct API for server-side
+    const apiUrl = process.client
+      ? `/api/pp/promotions?whitelabelId=${WHITELABEL_ID}&country=${lang.value}`
+      : `${PP_API_URL}PromotionsInfo?whitelabelId=${WHITELABEL_ID}&country=${lang.value}`;
+    
+    console.log('📡 PROMOTIONS: Fetching promotions from URL:', apiUrl);
+    
+    const response = await fetch(apiUrl);
+    console.log('📊 PROMOTIONS: Response status:', response.status);
+    console.log('📊 PROMOTIONS: Response ok:', response.ok);
+    
+    if (!response.ok) {
+      console.error('❌ PROMOTIONS: HTTP error:', response.status, response.statusText);
+      pp_promotions.value = []; // Graceful fallback
+      return;
+    }
+    
+    const responseData = await response.json();
+    
+    // Handle response format (local function returns data directly)
+    const data = responseData;
+    
+    console.log('✅ PROMOTIONS: Data received:', Array.isArray(data) ? `Array with ${data.length} items` : typeof data);
+    console.log('📄 PROMOTIONS: Data sample:', data ? JSON.stringify(data).substring(0, 200) : 'No data');
+    
+    pp_promotions.value = data || [];
+    console.log('✅ PROMOTIONS: pp_promotions.value set successfully');
   } catch (error) {
-    console.error(error);
+    console.error('❌ PROMOTIONS: Error fetching promotions:', error);
+    console.error('❌ PROMOTIONS: Error stack:', error.stack);
+    pp_promotions.value = []; // Ensure it's always an array on error
   }
 }
 
@@ -243,13 +337,97 @@ export async function fetchFilterByName() {
   }
 }
 
+// SILVER BULLET VPN FIX: Optimized fetchGames with caching and triple-fallback
 async function fetchGames() {
   try {
-    await fetchFilterByName();
-    const response = await fetch(KV_GAMES);
-    const data = await response.json();
+    // 1. Check cache FIRST (before Worker call)
+    const now = Date.now();
+    if (gamesCache && (now - gamesCacheTime) < GAMES_CACHE_DURATION) {
+      console.log('🎮 GAMES: Using cached games data');
+      // Set all game categories from cache
+      games.value = gamesCache.games;
+      newGames.value = gamesCache.newGames;
+      popularGames.value = gamesCache.popularGames;
+      casinoGames.value = gamesCache.casinoGames;
+      slotGames.value = gamesCache.slotGames;
+      jackpotGames.value = gamesCache.jackpotGames;
+      liveGames.value = gamesCache.liveGames;
+      scratchGames.value = gamesCache.scratchGames;
+      blackjackGames.value = gamesCache.blackjackGames;
+      rouletteGames.value = gamesCache.rouletteGames;
+      await updateLinks();
+      return; // No Worker call needed!
+    }
+    
+    // 2. Check if request already in flight (prevent duplicate calls)
+    if (gamesRequestInFlight) {
+      console.log('🎮 GAMES: Request already in progress, waiting...');
+      await gamesRequestInFlight;
+      // After waiting, use data from completed request
+      if (gamesCache) {
+        console.log('🎮 GAMES: Using data from completed request');
+        games.value = gamesCache.games;
+        newGames.value = gamesCache.newGames;
+        popularGames.value = gamesCache.popularGames;
+        casinoGames.value = gamesCache.casinoGames;
+        slotGames.value = gamesCache.slotGames;
+        jackpotGames.value = gamesCache.jackpotGames;
+        liveGames.value = gamesCache.liveGames;
+        scratchGames.value = gamesCache.scratchGames;
+        blackjackGames.value = gamesCache.blackjackGames;
+        rouletteGames.value = gamesCache.rouletteGames;
+        await updateLinks();
+      }
+      return; // No duplicate Worker call!
+    }
+    
+    // 3. Start new request (only one at a time)
+    console.log('🎮 GAMES: Fetching fresh games data...');
+    gamesRequestInFlight = actuallyFetchGames();
+    await gamesRequestInFlight;
+    gamesRequestInFlight = null;
 
-    // Add your logic for processing the games data here
+  } catch (error) {
+    console.error('❌ GAMES: Error fetching games:', error);
+    gamesRequestInFlight = null; // Reset on error
+    // Don't clear existing games on error, just log it
+  }
+}
+
+// Triple-fallback strategy for maximum VPN compatibility
+async function actuallyFetchGames() {
+  try {
+    await fetchFilterByName();
+    
+    // 1. Try local CloudFlare Function first (SILVER BULLET VPN FIX)
+    console.log('🎮 GAMES: Trying local function:', KV_GAMES_PRIMARY);
+    let response = await fetch(KV_GAMES_PRIMARY);
+    let data;
+    
+    if (response.ok) {
+      data = await response.json();
+      console.log('✅ GAMES: Local games function succeeded');
+    } else {
+      // 2. Try local worker fallback
+      console.log('🎮 GAMES: Trying local worker fallback:', KV_GAMES_FALLBACK);
+      response = await fetch(KV_GAMES_FALLBACK);
+      if (response.ok) {
+        data = await response.json();
+        console.log('✅ GAMES: Local worker fallback succeeded');
+      } else {
+        // 3. Final fallback to external worker
+        console.log('🎮 GAMES: Trying external worker:', KV_GAMES_EXTERNAL);
+        response = await fetch(KV_GAMES_EXTERNAL);
+        if (response.ok) {
+          data = await response.json();
+          console.log('✅ GAMES: External worker succeeded');
+        } else {
+          throw new Error('All games API endpoints failed');
+        }
+      }
+    }
+
+    // Process the games data
     const filteredGames = data.filter(game => {
       const hasName = filterByName.value.some(name => game.gameName.toLowerCase().includes(name.toLowerCase()));
       const hasId = filterByName.value.some(id => game.gameId == id);
@@ -264,15 +442,41 @@ async function fetchGames() {
     games.value = filteredGames;
     newGames.value = filteredGames.filter(game => game.gameFilters?.includes('New'));
     popularGames.value = filteredGames.filter(game => game.gameFilters?.includes('Featured'));
-	  casinoGames.value = filteredGames.filter(game => game.gameType?.includes('Casino'));
-	  slotGames.value = filteredGames.filter(game => game.gameType?.includes('Slots'));
-	  jackpotGames.value = filteredGames.filter(game => game.gameType?.includes('Jackpots'));
-	  liveGames.value = filteredGames.filter(game => game.gameType?.includes('Live'));
-	  scratchGames.value = filteredGames.filter(game => game.gameName?.toLowerCase().includes('scratch'));
+    casinoGames.value = filteredGames.filter(game => game.gameType?.includes('Casino'));
+    slotGames.value = filteredGames.filter(game => game.gameType?.includes('Slots'));
+    jackpotGames.value = filteredGames.filter(game => game.gameType?.includes('Jackpots'));
+    liveGames.value = filteredGames.filter(game => game.gameType?.includes('Live'));
+    scratchGames.value = filteredGames.filter(game => game.gameName?.toLowerCase().includes('scratch'));
     blackjackGames.value = filteredGames.filter(game => game.gameFilters?.includes('Blackjack'));
-	  rouletteGames.value = filteredGames.filter(game => game.gameFilters?.includes('Roulette'));
+    rouletteGames.value = filteredGames.filter(game => game.gameFilters?.includes('Roulette'));
 
-      async function updateLinks() {
+    // Cache the processed games data to reduce Worker load
+    gamesCache = {
+      games: games.value,
+      newGames: newGames.value,
+      popularGames: popularGames.value,
+      casinoGames: casinoGames.value,
+      slotGames: slotGames.value,
+      jackpotGames: jackpotGames.value,
+      liveGames: liveGames.value,
+      scratchGames: scratchGames.value,
+      blackjackGames: blackjackGames.value,
+      rouletteGames: rouletteGames.value
+    };
+    gamesCacheTime = Date.now();
+    
+    console.log('✅ GAMES: Games data cached successfully for', GAMES_CACHE_DURATION / 60000, 'minutes');
+
+    await updateLinks();
+
+  } catch (error) {
+    console.error('❌ GAMES: All games API endpoints failed:', error);
+    // Graceful degradation - don't clear existing games, just log error
+    throw error;
+  }
+}
+
+async function updateLinks() {
   const tracker = await handleParameter('tracker');
   const btag = await handleParameter('btag');
   const affid = await handleParameter('affid');
@@ -287,13 +491,6 @@ async function fetchGames() {
   regLink.value = `${PP_LOBBY_LINK}${queryStringParams ? '?' + queryStringParams : ''}#registration`;
   loginLink.value = `${PP_LOBBY_LINK}${queryStringParams ? '?' + queryStringParams : ''}#login`;
   playLink.value = `${PP_LOBBY_LINK}${queryStringParams ? '?' + queryStringParams : ''}#play/`;
-}
-
-    await updateLinks();
-
-  } catch (error) {
-    console.error('Error fetching games:', error);
-  }
 }
 
 export async function handleParameter(parameterName) {
@@ -318,30 +515,127 @@ export async function fetchSupportedCountries() {
 
 
 
-// globalData.js
-const footerIconsCache = new Map();
-const footerTextCache = new Map();
-
-export async function fetchFooterIcons(lang) {
-  if (footerIconsCache.has(lang)) {
-    footerIcons.value = footerIconsCache.get(lang);
-  } else {
-    const response = await fetch(`${PP_API_URL}GetInfoContentByCode?whitelabelId=${WHITELABEL_ID}&country=${lang}&code=footericon`);
-    const data = await response.json();
-    footerIcons.value = data;
-    footerIconsCache.set(lang, data);
+// CONTENT API: Use external workers for KV caching benefits
+export async function fetchCachedContent(code, country = lang.value) {
+  // Validate code parameter
+  if (!code || code === 'undefined' || typeof code !== 'string') {
+    console.error('❌ CONTENT: Invalid code parameter:', { code, type: typeof code });
+    return '';
+  }
+  
+  const resolvedCountry = country;
+  const cacheKey = `content:${code}:${WHITELABEL_ID}:${resolvedCountry}`;
+  const now = Date.now();
+  
+  // Check local cache first
+  if (contentCache.has(cacheKey)) {
+    const cached = contentCache.get(cacheKey);
+    if ((now - cached.timestamp) < CONTENT_CACHE_DURATION) {
+      console.log('📄 CONTENT: Using cached content for', code);
+      return cached.data;
+    }
+  }
+  
+  try {
+    console.log('📄 CONTENT: Fetching fresh content for', code);
+    console.log('🔍 CONTENT DEBUG: country parameter =', resolvedCountry);
+    console.log('🔍 CONTENT DEBUG: lang.value =', lang.value);
+    console.log('🔍 CONTENT DEBUG: cache key =', cacheKey);
+    console.log('🔍 CONTENT DEBUG: WHITELABEL_ID =', WHITELABEL_ID);
+    
+    // Use external Worker for KV caching benefits (not local function for content)
+    const apiUrl = `https://access-content-pp.tech1960.workers.dev/?type=content&codes=${code}&whitelabelId=${WHITELABEL_ID}&country=${resolvedCountry}`;
+    console.log('🔍 CONTENT DEBUG: Full API URL =', apiUrl);
+    
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      console.error('❌ CONTENT: HTTP error:', response.status, response.statusText);
+      return '';
+    }
+    
+    const responseData = await response.json();
+    const data = responseData[code];
+    const htmlContent = data && data[0] ? data[0].Html : '';
+    
+    // Cache the result locally
+    contentCache.set(cacheKey, {
+      data: htmlContent,
+      timestamp: now
+    });
+    
+    console.log('✅ CONTENT: Content cached for', code, 'for', CONTENT_CACHE_DURATION / 60000, 'minutes');
+    return htmlContent;
+    
+  } catch (error) {
+    console.error('❌ CONTENT: Error fetching content:', error);
+    return '';
   }
 }
 
-export async function fetchFooterText(lang) {
-  if (footerTextCache.has(lang)) {
-    footerText.value = footerTextCache.get(lang);
-  } else {
-    const response = await fetch(`${PP_API_URL}GetInfoContentByCode?whitelabelId=${WHITELABEL_ID}&country=${lang}&code=footertext`);
+// Server-side fallback functions for footer content
+async function fetchFooterIconsServer(lang) {
+  try {
+    const response = await fetch(`${PP_API_URL}InfoContent?whitelabelId=${WHITELABEL_ID}&code=footericon`);
+    const data = await response.json();
+    footerIcons.value = data;
+  } catch (error) {
+    console.error('❌ FOOTER ICONS: Server fetch error:', error);
+    footerIcons.value = [];
+  }
+}
+
+async function fetchFooterTextServer(lang) {
+  try {
+    const response = await fetch(`${PP_API_URL}InfoContent?whitelabelId=${WHITELABEL_ID}&code=footertext`);
     const data = await response.json();
     footerText.value = data;
-    footerTextCache.set(lang, data);
+  } catch (error) {
+    console.error('❌ FOOTER TEXT: Server fetch error:', error);
+    footerText.value = [];
   }
+}
+
+// UNIFIED FOOTER CONTENT API: External workers for KV caching
+export async function fetchFooterContent(lang) {
+  const cacheKey = `footer_${lang}`;
+  
+  if (footerContentCache.has(cacheKey)) {
+    const cached = footerContentCache.get(cacheKey);
+    footerIcons.value = cached.footericon || [];
+    footerText.value = cached.footertext || [];
+    console.log('📄 FOOTER: Using cached footer content');
+    return;
+  }
+
+  try {
+    console.log('📄 FOOTER: Fetching from external worker for KV caching');
+    
+    // Use external worker for proper KV caching (unified call for both icons and text)
+    const apiUrl = `https://access-content-pp.tech1960.workers.dev/?type=content&codes=footericon,footertext&whitelabelId=${WHITELABEL_ID}&country=${lang}`;
+
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    
+    footerIcons.value = data.footericon || [];
+    footerText.value = data.footertext || [];
+    
+    // Cache the unified result
+    footerContentCache.set(cacheKey, data);
+    console.log('✅ FOOTER: External worker with KV caching succeeded');
+  } catch (error) {
+    console.error('❌ FOOTER: Error:', error);
+    footerIcons.value = [];
+    footerText.value = [];
+  }
+}
+
+// Legacy functions for backward compatibility (now use unified function)
+export async function fetchFooterIcons(lang) {
+  await fetchFooterContent(lang);
+}
+
+export async function fetchFooterText(lang) {
+  await fetchFooterContent(lang);
 }
 
 

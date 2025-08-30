@@ -3,7 +3,19 @@
         <div class="container mx-auto pt-20">
             <h1 class="text-center">{{ msgTranslate?.promotions || 'Promotions' }}</h1>
         </div>
-        <div class="container mx-auto">
+        
+        <!-- Loading State -->
+        <div v-if="loading" class="text-center py-10">
+            <p>Loading promotions...</p>
+        </div>
+        
+        <!-- Error State -->
+        <div v-else-if="error" class="text-center py-10">
+            <p>Error loading promotions. Please try again later.</p>
+        </div>
+        
+        <!-- Promotions Content -->
+        <div v-else-if="pp_promotions && pp_promotions.length > 0" class="container mx-auto">
             <div class="p-5 grid grid-cols-1 lg:grid-cols-2 my-10 bg-gray-300 shadow-black shadow-lg rounded-lg items-center"
                 v-for="promo in pp_promotions" :key="promo.code">
                 <img class="rounded-lg w-full"
@@ -31,36 +43,43 @@
                     </div>
             </div>
         </div>
-    </div>
+        
+        <!-- No Promotions State -->
+        <div v-else class="text-center py-10">
+            <p>No promotions available for your region.</p>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useHead } from '#imports';
-import { pp_promotions, msgTranslate, regLink, loginLink, loadLang } from '~/composables/globalData';
-const myPromotionsPosts = useFetch(() => fetchApiPromotions());
+import { pp_promotions, msgTranslate, regLink, loginLink, loadLang, fetchApiPromotions } from '~/composables/globalData';
 
+const loading = ref(true);
+const error = ref(null);
+
+// CLIENT-SIDE ONLY LOADING to prevent hydration issues
 onMounted(async () => {
     try {
-        await useAsyncData('translations', async () => {
-            try {
-                await loadLang();
-            } catch (error) {
-                console.error('Error loading translations:', error);
-            }
-        });
-    } catch (error) {
-        console.error('Error in promotions page setup:', error);
+        console.log('🎁 PROMOTIONS PAGE: Starting client-side data load');
+        await loadLang();
+        await fetchApiPromotions();
+        console.log('✅ PROMOTIONS PAGE: Data loaded successfully');
+    } catch (err) {
+        console.error('❌ PROMOTIONS PAGE: Error loading data:', err);
+        error.value = err;
+    } finally {
+        loading.value = false;
     }
 });
 
 // Set page-specific meta tags
 useHead({
-    title: 'Promotions - Hippozino',
+    title: 'Promotions - Vegas Paradise',
     meta: [
-        { hid: 'description', name: 'description', content: 'Explore all the best promotions available at Hippozino!' },
-        { name: 'keywords', content: 'promotions, games, casino, Hippozino' }
+        { hid: 'description', name: 'description', content: 'Explore all the best promotions available at Vegas Paradise!' },
+        { name: 'keywords', content: 'promotions, games, casino, Vegas Paradise' }
     ]
 });
 </script>
