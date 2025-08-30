@@ -1,0 +1,2 @@
+const d=[".article[data-v-a4ed6bdd]{color:#000!important}.promotionPage[data-v-a4ed6bdd],h2[data-v-a4ed6bdd],h3[data-v-a4ed6bdd],h4[data-v-a4ed6bdd],h5[data-v-a4ed6bdd],h6[data-v-a4ed6bdd],p[data-v-a4ed6bdd]{color:#2f4f4f!important}"];export{d as default};
+//# sourceMappingURL=index-styles.BIl5SkX_.mjs.map
