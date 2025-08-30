@@ -73,8 +73,13 @@ onMounted(async () => {
 });
 
 const handleClick = async (key) => {
-    const code = globalContent[key];
-    await loadContent(code);
+    const code = globalContent.value[key]; // Access .value since globalContent is a ref
+    console.log('📄 COMPLIANCE SLUG: Button clicked for key:', key, 'code:', code);
+    if (code) {
+        await loadContent(code);
+    } else {
+        console.error('❌ COMPLIANCE SLUG: No code found for key:', key, 'globalContent:', globalContent.value);
+    }
 };
 </script>
 
