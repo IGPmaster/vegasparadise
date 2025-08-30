@@ -309,10 +309,16 @@ async function fetchApiPromotions() {
 
 export async function fetchPromotions() {
   try {
-    //console.log('Fetching Promotions...');
-    const response = await fetch(`${WP_API}promotions/?_fields=content,yoast_head_json.description,yoast_head_json.og_title,acf&acf_format=standard`);
-    //const response = await fetch(`${WP_API}promotions`);
-    console.log('Response received:', response);
+    console.log('🎁 WP PROMOTIONS: Fetching WordPress promotions via local function...');
+    
+    // Use local CloudFlare Function to avoid CORS issues (SILVER BULLET VPN FIX)
+    const apiUrl = process.client
+      ? '/api/wp/promotions' // LOCAL function (same-origin, no CORS)
+      : `${WP_API}promotions/?_fields=content,yoast_head_json.description,yoast_head_json.og_title,acf&acf_format=standard`; // Server-side direct
+    
+    console.log('🎁 WP PROMOTIONS: Using endpoint:', apiUrl);
+    const response = await fetch(apiUrl);
+    console.log('🎁 WP PROMOTIONS: Response received:', response.status, response.statusText);
     
     const data = await response.json();
     console.log('JSON data:', data);
@@ -337,7 +343,9 @@ export async function fetchPromotions() {
     console.log('promotionsPosts.value:', promotionsPosts.value);
     
   } catch (error) {
-    console.error('Error fetching Promotions:', error);
+    console.error('❌ WP PROMOTIONS: Error fetching WordPress promotions:', error);
+    console.error('❌ WP PROMOTIONS: Error details:', error.message);
+    promotionsPosts.value = []; // Ensure it's always an array on error
   }
 }
 

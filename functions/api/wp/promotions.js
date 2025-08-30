@@ -19,7 +19,7 @@ export async function onRequest(context) {
     console.log('🔄 WP PROXY: Fetching WordPress promotions...');
     
     // WordPress API endpoint - DUKES CASINO CONFIG
-    const wpApiUrl = 'https://headless.dukescasino.com/wp-json/wp/v2/promotions/?_fields=content,yoast_head_json.description,yoast_head_json.og_title,acf&acf_format=standard';
+    const wpApiUrl = 'https://headless.vegasparadise.com/wp-json/wp/v2/promotions/?_fields=content,yoast_head_json.description,yoast_head_json.og_title,acf&acf_format=standard';
     
     console.log('📡 WP PROXY: Calling WordPress API:', wpApiUrl);
     
