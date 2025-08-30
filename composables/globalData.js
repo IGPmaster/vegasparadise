@@ -171,7 +171,6 @@ export async function loadLang() {
         if (typeof window !== 'undefined') {
           window.__isRealCountry = true;
           window.__originalDetectedCountry = originalLang;
-          console.log('🇨🇦 PLAYTECH: Real CA detected - Playtech games will be filtered');
         }
       } else {
         // Use proper EU fallback logic instead of hardcoded CA
@@ -183,7 +182,6 @@ export async function loadLang() {
         if (typeof window !== 'undefined') {
           window.__isRealCountry = false;
           window.__originalDetectedCountry = originalLang;
-          console.log('🇨🇦 PLAYTECH: Fallback CA detected - Playtech games will be included');
         }
       }
     } catch (error) {
@@ -319,6 +317,34 @@ export async function fetchPromotions() {
     console.log('🎁 WP PROMOTIONS: Using endpoint:', apiUrl);
     const response = await fetch(apiUrl);
     console.log('🎁 WP PROMOTIONS: Response received:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      console.error('❌ WP PROMOTIONS: API returned error status:', response.status);
+      // If local function fails, try direct API as fallback
+      if (process.client && apiUrl.startsWith('/api/')) {
+        console.log('🎁 WP PROMOTIONS: Trying direct API as fallback...');
+        const fallbackResponse = await fetch(`${WP_API}promotions/?_fields=content,yoast_head_json.description,yoast_head_json.og_title,acf&acf_format=standard`);
+        if (fallbackResponse.ok) {
+          const fallbackData = await fallbackResponse.json();
+          console.log('✅ WP PROMOTIONS: Direct API fallback succeeded');
+          const filteredData = fallbackData.filter((item) => {
+            const geoTarget = item.acf.geo_target_country_sel;
+            return geoTarget && geoTarget.includes(lang.value);
+          });
+          if (filteredData.length === 0) {
+            const iePosts = fallbackData.filter((item) => {
+              const geoTarget = item.acf.geo_target_country_sel;
+              return geoTarget && geoTarget.includes('IE');
+            });
+            filteredData.push(...iePosts);
+          }
+          promotionsPosts.value = filteredData;
+          return;
+        }
+      }
+      promotionsPosts.value = [];
+      return;
+    }
     
     const data = await response.json();
     console.log('JSON data:', data);
@@ -470,12 +496,8 @@ async function actuallyFetchGames() {
           const isPlaytech = game.provider?.toLowerCase() === 'playtech' || 
                             game.subProvider?.toLowerCase() === 'playtech';
           if (isPlaytech) {
-            console.log('🇨🇦 PLAYTECH: Filtering out Playtech game for real CA:', game.gameName);
             isPlaytechExcluded = true;
           }
-        } else {
-          // This is a FALLBACK CA user (non-EU country falling back to CA) - include Playtech
-          console.log('🇨🇦 PLAYTECH: Fallback CA user - Playtech games included');
         }
       }
 
