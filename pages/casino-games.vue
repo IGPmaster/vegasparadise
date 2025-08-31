@@ -73,10 +73,10 @@ const { fetch, error, $fetchState } = useFetch(async () => {
 });
 // Set page-specific meta tags
 useHead({
-	title: 'Casino Games - Hippozino',
+	title: 'Casino Games - Vegas Paradise',
 	meta: [
-		{ hid: 'description', name: 'description', content: 'Explore the best casino games available at Hippozino!' },
-		{ name: 'keywords', content: 'casino, games, casino, Hippozino' }
+		{ hid: 'description', name: 'description', content: 'Explore the best casino games available at Vegas Paradise!' },
+		{ name: 'keywords', content: 'casino, games, casino, Vegas Paradise' }
 	]
 });
 </script>

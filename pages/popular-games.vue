@@ -71,10 +71,10 @@ const { fetch, error, $fetchState } = useFetch(async () => {
 });
 // Set page-specific meta tags
 useHead({
-	title: 'Popular Games - Hippozino',
+	title: 'Popular Games - Vegas Paradise',
 	meta: [
-		{ hid: 'description', name: 'description', content: 'Explore the most popular games available at Hippozino!' },
-		{ name: 'keywords', content: 'popular, games, casino, Hippozino' }
+		{ hid: 'description', name: 'description', content: 'Explore the most popular games available at Vegas Paradise!' },
+		{ name: 'keywords', content: 'popular, games, casino, Vegas Paradise' }
 	]
 });
 </script>

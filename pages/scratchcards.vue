@@ -74,10 +74,10 @@ const { fetch, error, $fetchState } = useFetch(async () => {
 
 // Set page-specific meta tags
 useHead({
-	title: 'Scratchcards - Hippozino',
+	title: 'Scratchcards - Vegas Paradise',
 	meta: [
-		{ hid: 'description', name: 'description', content: 'Explore the best scratchcards games available at Hippozino!' },
-		{ name: 'keywords', content: 'scratchcards, games, casino, Hippozino' }
+		{ hid: 'description', name: 'description', content: 'Explore the best scratchcards games available at Vegas Paradise!' },
+		{ name: 'keywords', content: 'scratchcards, games, casino, Vegas Paradise' }
 	]
 });
 </script>
