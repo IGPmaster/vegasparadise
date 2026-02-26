@@ -10,8 +10,8 @@ export default defineNuxtConfig({
     },
     prerender: {
       fallback: true,
-      crawlLinks: true,     // Add this to prerender linked pages
-      routes: ['/']         // Add this to ensure root is prerendered
+      crawlLinks: false,
+      routes: ['/']
     }
   },
 
