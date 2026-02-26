@@ -37,11 +37,11 @@
 		<!-- Image grid section -->
 		<div v-else class="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
 			<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
-				<div v-for="game in popularGames.slice(-16).reverse()" :key="game.id" :class="'item-' + game.id"
+				<div v-for="game in displayGames" :key="game.id" :class="'item-' + game.id"
 					class="shadow-lg rounded-md">
 					<div class="show show-first relative">
 						<a :href="regLink" target="_blank">
-							<img class="rounded-md w-full" :src="game.image" @error="game.image = 'newGameImg.jpg'"
+							<img class="rounded-md w-full" :src="game.image" @error="onImageError(game)"
 								loading="lazy" :alt="'Image of ' + game.gameName + ' online slot. ' + game.description"
 								:title="game.gameName + ' - ' + game.id" width="376" height="250" />
 						</a>
@@ -77,9 +77,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineEmits } from 'vue';
+import { ref, computed, onMounted, defineEmits } from 'vue';
 const loading = ref(true);
 import { popularGames, msgTranslate, regLink, loginLink, loadLang, fetchGames } from '~/composables/globalData';
+
+const failedImages = ref(new Set());
+function onImageError(game) {
+	failedImages.value = new Set([...failedImages.value, game.id]);
+}
+const displayGames = computed(() => {
+	return [...(popularGames.value || [])]
+		.reverse()
+		.filter(game => !failedImages.value.has(game.id))
+		.slice(0, 16);
+});
 
 const emit = defineEmits(['loaded']);
 

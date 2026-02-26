@@ -68,7 +68,7 @@
 									class="" 
 									:src="game.image"
 									loading="lazy"
-									@error="game.image = 'newGameImg.jpg'"
+									@error="onImageError(game)"
 									:alt="'Image of ' + game.gameName + ' online slot. ' + game.description"
 									:title="game.gameName + ' - ' + game.id" />
 							</a>
@@ -92,6 +92,11 @@
 import { ref, computed, onMounted } from 'vue';
 import { useHead } from '#imports';
 import { games, msgTranslate, regLink, loginLink, playLink, loadLang } from '~/composables/globalData';
+
+const failedImages = ref(new Set());
+function onImageError(game) {
+	failedImages.value = new Set([...failedImages.value, game.id]);
+}
 
 let selectedProvider = ref('all');
 let selectedSubProvider = ref('all');
@@ -162,7 +167,9 @@ let filteredGames = computed(() => {
 });
 
 let sortedGames = computed(() => {
-	return [...filteredGames.value].sort((a, b) => a.gameName.localeCompare(b.gameName));
+	return [...filteredGames.value]
+		.filter(game => !failedImages.value.has(game.id))
+		.sort((a, b) => a.gameName.localeCompare(b.gameName));
 });
 
 onMounted(async () => {

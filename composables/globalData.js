@@ -33,8 +33,9 @@ const PP_PROMOTIONS_API = `${PP_API_URL}PromotionsInfo?whitelabelId=${WHITELABEL
 export const PP_LOBBY_LINK = 'https://vegasparadise.casino-pp.net/';
 
 // SILVER BULLET VPN FIX: Use LOCAL CloudFlare Functions for VPN compatibility
-const KV_GAMES_PRIMARY = '/api/pp/games';           // LOCAL function (same-origin)
-const KV_GAMES_FALLBACK = '/api/worker/games';      // LOCAL fallback
+// SSR-safe: server-side uses direct API, client-side uses local proxy
+const KV_GAMES_PRIMARY = process.client ? '/api/pp/games' : 'https://content.progressplay.net/api23/api/game?whitelabelId=26';
+const KV_GAMES_FALLBACK = process.client ? '/api/worker/games' : 'https://access-ppgames.tech1960.workers.dev/';
 const KV_GAMES_EXTERNAL = 'https://access-ppgames.tech1960.workers.dev/'; // External fallback
 const KV_GAMES = KV_GAMES_PRIMARY;
 
