@@ -30,7 +30,7 @@ export const globalContent = ref({
 export const WHITELABEL_ID = 26;
 export const PP_API_URL = 'https://content.progressplay.net/api23/api/';
 const PP_PROMOTIONS_API = `${PP_API_URL}PromotionsInfo?whitelabelId=${WHITELABEL_ID}&country=`;
-export const PP_LOBBY_LINK = 'https://vegasparadise.casino-pp.net/';
+export const PP_LOBBY_LINK = 'https://play.vegasparadise.com/';
 
 // SILVER BULLET VPN FIX: Use LOCAL CloudFlare Functions for VPN compatibility
 // SSR-safe: server-side uses direct API, client-side uses local proxy

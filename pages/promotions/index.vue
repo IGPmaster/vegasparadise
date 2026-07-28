@@ -33,7 +33,7 @@
                     <div v-if="promo.disclaimer !== null">
                         <span v-html="promo.disclaimer" class="text-sm/[12px] py-5 text-slate-800/75"></span>
                         <span class="text-sm/[12px] py-5 text-slate-800/75">
-                            <a :href="'https://vegasparadise.casino-pp.net/promotions?code=' + promo.code" 
+                            <a :href="'https://play.vegasparadise.com/promotions?code=' + promo.code" 
                                 class="no_underline"
                                 target="_blank" 
                                 rel="noopener noreferrer">

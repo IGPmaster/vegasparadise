@@ -14,7 +14,7 @@
     <div class="flex flex-col lg:flex-row">
        
         <div class="w-full lg:w-5/12">
-            <a href="https://vegasparadise.casino-pp.net/?nav=login"><img class="rounded-lg w-full" src="https://igpcrma2n.s3.amazonaws.com/ppcms/halloween-tournament/lp-halloween-slot-tournament.png" loading="lazy"></a>
+            <a href="https://play.vegasparadise.com/?nav=login"><img class="rounded-lg w-full" src="https://igpcrma2n.s3.amazonaws.com/ppcms/halloween-tournament/lp-halloween-slot-tournament.png" loading="lazy"></a>
         </div>
 
         
@@ -23,9 +23,9 @@
                 <h4 class="text-xl lg:text-3xl font-bold text-yellow-300 mt-0 leading-tight">£1,000 Prize Pool!</h4>
                     <p class="text-lg leading-tight">One of the highlights of Halloween at Vegas Paradise is the special Spooktacular Slot Tournament. This thrilling competition pits players against each other in a race to the top of the leaderboard. With a fantastic prize pool of £1000 in cash shared between the top 50 players, there's plenty of incentive to join in the fun and test your luck on the spooky reels. Will you be one of the lucky winners this Halloween?</p>
                     </div>
-                        <div class="text-center"><a href="https://vegasparadise.casino-pp.net/?nav=login"><button class="bg-gray-800 hover:bg-gray-900 text-yellow-300 font-bold uppercase my-3 py-3 px-6 rounded-lg">Enter The Tournament</button></a></div>
+                        <div class="text-center"><a href="https://play.vegasparadise.com/?nav=login"><button class="bg-gray-800 hover:bg-gray-900 text-yellow-300 font-bold uppercase my-3 py-3 px-6 rounded-lg">Enter The Tournament</button></a></div>
                 
-                        <div class="text-sm/[14px] py-5 text-slate-300">Funded players only (18+ Only). Points accumulated based on wagering on any slot games excluding jackpot games. £/€/$1 wagered equals 1 point on leaderboard. Top prize is £/€/$150. £/€/$ 1000 will be shared between top 50 players. Promotion runs from October 25th – 31st. <a href="https://vegasparadise.casino-pp.net/promotions?code=IGPHalloweenTournament24" class="underline">Full Terms Apply</a>
+                        <div class="text-sm/[14px] py-5 text-slate-300">Funded players only (18+ Only). Points accumulated based on wagering on any slot games excluding jackpot games. £/€/$1 wagered equals 1 point on leaderboard. Top prize is £/€/$150. £/€/$ 1000 will be shared between top 50 players. Promotion runs from October 25th – 31st. <a href="https://play.vegasparadise.com/promotions?code=IGPHalloweenTournament24" class="underline">Full Terms Apply</a>
                         </div>
                     
         </div>
@@ -36,7 +36,7 @@
     <div class="flex flex-col lg:flex-row">
        
         <div class="w-full lg:w-5/12">
-           <a href="https://vegasparadise.casino-pp.net/?nav=login"> <img class="rounded-lg w-full" src="https://igpcrma2n.s3.amazonaws.com/ppcms/halloween-tournament/lp-halloween-good-games.png" loading="lazy"></a>
+           <a href="https://play.vegasparadise.com/?nav=login"> <img class="rounded-lg w-full" src="https://igpcrma2n.s3.amazonaws.com/ppcms/halloween-tournament/lp-halloween-good-games.png" loading="lazy"></a>
         </div>
 
         
@@ -45,7 +45,7 @@
                 <h4 class="text-xl lg:text-3xl font-bold text-yellow-300 mt-0">Play Spooky Slots with Scary Spins!</h4>
                         <p class="text-lg leading-tight">Get into the Halloween spirit with a great selection of games at Vegas Paradise. From the bone-chilling Big Bass Halloween to the blood-curdling Bloodsuckers, there's no shortage of spooky thrills to be had. If you're looking for something a little more light-hearted, why not give Spooky Carnival a spin? With its colourful graphics and festive atmosphere, this game is sure to get you in the Halloween mood.</p>
                     </div>
-                        <div class="text-center"><a href="https://vegasparadise.casino-pp.net/?nav=login"><button class="bg-black hover:bg-gray-800 text-yellow-300 font-bold uppercase my-3 py-3 px-6 rounded-lg">Play Spooky Games</button></a></div>
+                        <div class="text-center"><a href="https://play.vegasparadise.com/?nav=login"><button class="bg-black hover:bg-gray-800 text-yellow-300 font-bold uppercase my-3 py-3 px-6 rounded-lg">Play Spooky Games</button></a></div>
                 
                         <div class="text-sm/[12px] py-5 text-slate-300">
                         </div>
@@ -58,7 +58,7 @@
     <div class="flex flex-col lg:flex-row">
        
         <div class="w-full lg:w-5/12">
-            <a href="https://vegasparadise.casino-pp.net/?nav=login"><img class="rounded-lg w-full" src="https://igpcrma2n.s3.amazonaws.com/ppcms/halloween-tournament/lp-halloween-deposit-bonus.png" loading="lazy"></a>
+            <a href="https://play.vegasparadise.com/?nav=login"><img class="rounded-lg w-full" src="https://igpcrma2n.s3.amazonaws.com/ppcms/halloween-tournament/lp-halloween-deposit-bonus.png" loading="lazy"></a>
         </div>
 
         
@@ -68,10 +68,10 @@
                         <p class="text-xl uppercase leading-tight">Deposit £10 or more & use code: <span class="underline font-bold">Halloween</span></p>
                     <p class="text-lg leading-tight">On the day of Halloween, make sure to take advantage of the special deposit offer on the fun game Helloween. Based on the popular German heavy metal band, this game is a must-play for any music lover. With extra bonuses and rewards up for grabs, it's the perfect way to add some extra excitement to your Halloween celebrations. Don't miss out on this spooktacular offer!</p>
                     </div>
-                        <div class="text-center"><a href="https://vegasparadise.casino-pp.net/?nav=login"><button class="bg-black hover:bg-gray-800 text-yellow-300 font-bold uppercase my-3 py-3 px-6 rounded-lg">Get Your Deposit Bonus</button></a></div>
+                        <div class="text-center"><a href="https://play.vegasparadise.com/?nav=login"><button class="bg-black hover:bg-gray-800 text-yellow-300 font-bold uppercase my-3 py-3 px-6 rounded-lg">Get Your Deposit Bonus</button></a></div>
                 
                         <div class="text-sm/[14px] py-5 text-slate-300">
-                            Funded players only. Deposit Offer: Wagering from real balance first. 50X wagering the bonus or any winnings from bonus. Contribution varies per game. Selected games only. The wagering requirement calculated on bonus bets only. Bonus once credited is valid for 48 hours from receipt. Max conversion: 3 times the bonus amount or from free spins: £/€/$ 20. Excluded Skrill & Neteller deposits. <a href="https://vegasparadise.casino-pp.net/promotions?code=IGPHalloweenDepositOffer24" class="underline">Full Terms Apply</a>
+                            Funded players only. Deposit Offer: Wagering from real balance first. 50X wagering the bonus or any winnings from bonus. Contribution varies per game. Selected games only. The wagering requirement calculated on bonus bets only. Bonus once credited is valid for 48 hours from receipt. Max conversion: 3 times the bonus amount or from free spins: £/€/$ 20. Excluded Skrill & Neteller deposits. <a href="https://play.vegasparadise.com/promotions?code=IGPHalloweenDepositOffer24" class="underline">Full Terms Apply</a>
                         </div>
                     
         </div>
@@ -80,7 +80,7 @@
 <div class="container mx-auto pt-[5rem] pb-8 px-4 text-center w-full lg:w-8/12 ">
             <h2 class="font-bold text-2xl lg:tex-4xtl leading-tight">Join the Fun This Halloween</h2>
             <p class="text-lg leading-tight text-orange-100">Whether you're a seasoned player or new to the world of online gaming, there's something for everyone at Vegas Paradise this Halloween. With a wide variety of games, exciting tournaments, and special offers, it's the perfect place to spend the spookiest night of the year. So why wait? Join in the fun this Halloween at Vegas Paradise and make it a night to remember!</p>
-            <div class="text-center"><a href="https://vegasparadise.casino-pp.net/?nav=login"><button class="bg-orange-600 hover:bg-orange-400 text-white font-bold uppercase my-3 py-3 px-6 rounded-lg">Play Here</button></a></div>
+            <div class="text-center"><a href="https://play.vegasparadise.com/?nav=login"><button class="bg-orange-600 hover:bg-orange-400 text-white font-bold uppercase my-3 py-3 px-6 rounded-lg">Play Here</button></a></div>
         </div>
 
 
