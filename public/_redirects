@@ -1,1 +1,3 @@
+/promotions https://play.vegasparadise.com/promotions 301
+/promotions/* https://play.vegasparadise.com/promotions 301
 /* /index.html 200

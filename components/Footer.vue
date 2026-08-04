@@ -10,9 +10,9 @@
                 {{ msgTranslate?.home || 'Home' }}</NuxtLink>
             </li>
             <li>
-              <NuxtLink to="/promotions"
+              <a href="https://play.vegasparadise.com/promotions"
                 class="uppercase font-light text-sm text-zinc-200 py-2 px-4 bg-stone-800 rounded hover:bg-[#323131] transition ease-in-out">
-                {{ msgTranslate?.promotions || 'Promotions' }}</NuxtLink>
+                {{ msgTranslate?.promotions || 'Promotions' }}</a>
             </li>
             <li>
               <NuxtLink to="/compliance"

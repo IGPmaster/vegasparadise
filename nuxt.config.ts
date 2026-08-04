@@ -17,6 +17,7 @@ export default defineNuxtConfig({
 
   // Use ISR (Incremental Static Regeneration) for all routes
   routeRules: {
+    '/promotions': { redirect: { to: 'https://play.vegasparadise.com/promotions', statusCode: 301 } },
     '/**': { isr: true }
   },
 

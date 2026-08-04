@@ -10,8 +10,8 @@
                 class="menu bg-gray-700 text-white rounded text-left w-36 drop-shadow-[0_15px_15px_rgba(0,0,0,0.50)] transition duration-300 ease-in-out transform scale-0 origin-top"
                 id="menu">
                 <NuxtLink to="/" class="menu-item hover:bg-slate-800 px-5">{{ msgTranslate?.home || 'Home' }}</NuxtLink>
-                <NuxtLink to="/promotions" class="menu-item hover:bg-slate-800 px-5">{{ msgTranslate?.promotions || 'Promotions' }}
-                </NuxtLink>
+                <a href="https://play.vegasparadise.com/promotions" class="menu-item hover:bg-slate-800 px-5">{{ msgTranslate?.promotions || 'Promotions' }}
+                </a>
                 <NuxtLink to="/compliance" class="menu-item hover:bg-slate-800 px-5">{{ msgTranslate?.legal || 'Legal' }}</NuxtLink>
                 <NuxtLink to="/all-games" class="menu-item hover:bg-slate-800 px-5">{{ msgTranslate?.all_games || 'All Games' }}
                 </NuxtLink>
