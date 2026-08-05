@@ -71,9 +71,9 @@ export function useCookieConsent() {
     const queryString = queryParams.join('&');
     const queryStringWithQuestionMark = queryString ? `?${queryString}` : '';
     
-    regLink.value = `${PP_LOBBY_LINK}${queryStringWithQuestionMark}#registration`;
-    loginLink.value = `${PP_LOBBY_LINK}${queryStringWithQuestionMark}#login`;
-    playLink.value = `${PP_LOBBY_LINK}${queryStringWithQuestionMark}#play/`;
+    regLink.value = `${PP_LOBBY_LINK}?nav=registration${queryString ? '&' + queryString : ''}`;
+    loginLink.value = `${PP_LOBBY_LINK}?nav=login${queryString ? '&' + queryString : ''}`;
+    playLink.value = `${PP_LOBBY_LINK}?nav=play${queryString ? '&' + queryString : ''}`;
   };
 
   const setAffiliateTracking = (tracker) => {

@@ -66,6 +66,7 @@ const rouletteGames = ref([]);
 const regLink = ref([null]);
 const loginLink = ref([null]);
 const playLink = ref([null]);
+const promotionsLink = ref(`${PP_LOBBY_LINK}promotions`);
 const msgTranslate = ref({});
 const pp_promotions = ref([]);
 const promotionsPosts = ref([]);
@@ -554,9 +555,10 @@ async function updateLinks() {
     affid ? `affid=${affid}` : '',
   ].filter(param => param !== '').join('&'); // Join only the non-empty parameters
 
-  regLink.value = `${PP_LOBBY_LINK}${queryStringParams ? '?' + queryStringParams : ''}#registration`;
-  loginLink.value = `${PP_LOBBY_LINK}${queryStringParams ? '?' + queryStringParams : ''}#login`;
-  playLink.value = `${PP_LOBBY_LINK}${queryStringParams ? '?' + queryStringParams : ''}#play/`;
+  regLink.value = `${PP_LOBBY_LINK}?nav=registration${queryStringParams ? '&' + queryStringParams : ''}`;
+  loginLink.value = `${PP_LOBBY_LINK}?nav=login${queryStringParams ? '&' + queryStringParams : ''}`;
+  playLink.value = `${PP_LOBBY_LINK}?nav=play${queryStringParams ? '&' + queryStringParams : ''}`;
+  promotionsLink.value = `${PP_LOBBY_LINK}promotions${queryStringParams ? '?' + queryStringParams : ''}`;
 }
 
 export async function handleParameter(parameterName) {
@@ -775,6 +777,7 @@ export {
     regLink,
     loginLink,
     playLink,
+    promotionsLink,
     msgTranslate,
     pp_promotions,
     promotionsPosts,

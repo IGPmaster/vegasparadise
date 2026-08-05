@@ -63,7 +63,7 @@
 				<div v-for="game in sortedGames" :key="game.id" :class="'item-' + game.excludedCountries">
 					<div class="">
 						<div class="show show-first first-content-border">
-							<a :href="playLink + game.serverGameId" target="_blank">
+							<a :href="playLink" target="_blank">
 								<img style="min-width: 100%;"
 									class="" 
 									:src="game.image"
@@ -73,7 +73,7 @@
 									:title="game.gameName + ' - ' + game.id" />
 							</a>
 							<div class='mask'>
-								<a :href="playLink + game.serverGameId" target="_blank">
+								<a :href="playLink" target="_blank">
 									<div class="gameDescr">
 										<div class="px-2" v-if="game && game.description && game.description.length > 0">{{ game.description }} From <strong>{{ game.subProvider }}</strong></div>
 										<i v-else class="large material-icons">play_arrow</i>

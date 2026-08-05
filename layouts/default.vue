@@ -10,7 +10,7 @@
                 class="menu bg-gray-700 text-white rounded text-left w-36 drop-shadow-[0_15px_15px_rgba(0,0,0,0.50)] transition duration-300 ease-in-out transform scale-0 origin-top"
                 id="menu">
                 <NuxtLink to="/" class="menu-item hover:bg-slate-800 px-5">{{ msgTranslate?.home || 'Home' }}</NuxtLink>
-                <a href="https://play.vegasparadise.com/promotions" class="menu-item hover:bg-slate-800 px-5">{{ msgTranslate?.promotions || 'Promotions' }}
+                <a :href="promotionsLink" class="menu-item hover:bg-slate-800 px-5">{{ msgTranslate?.promotions || 'Promotions' }}
                 </a>
                 <NuxtLink to="/compliance" class="menu-item hover:bg-slate-800 px-5">{{ msgTranslate?.legal || 'Legal' }}</NuxtLink>
                 <NuxtLink to="/all-games" class="menu-item hover:bg-slate-800 px-5">{{ msgTranslate?.all_games || 'All Games' }}
@@ -25,7 +25,7 @@
                 </NuxtLink>
                 <NuxtLink to="/compliance/contact" class="menu-item hover:bg-slate-800 px-5">{{ msgTranslate?.contact || 'Contact' }}
                 </NuxtLink>
-                <a :href="regLink" class="menu-item hover:bg-slate-800 px-5">{{ msgTranslate?.login || 'Login' }}</a>
+                <a :href="loginLink" class="menu-item hover:bg-slate-800 px-5">{{ msgTranslate?.login || 'Login' }}</a>
               </div>
             </div>
           </div>
@@ -64,7 +64,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import CookieConsent from '~/components/CookieConsent.vue';
-import { msgTranslate, regLink, loginLink, loadLang } from '~/composables/globalData';
+import { msgTranslate, regLink, loginLink, promotionsLink, loadLang } from '~/composables/globalData';
 
 
 const menuIsOpen = ref(false);

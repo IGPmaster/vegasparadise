@@ -10,7 +10,7 @@
                 {{ msgTranslate?.home || 'Home' }}</NuxtLink>
             </li>
             <li>
-              <a href="https://play.vegasparadise.com/promotions"
+              <a :href="promotionsLink"
                 class="uppercase font-light text-sm text-zinc-200 py-2 px-4 bg-stone-800 rounded hover:bg-[#323131] transition ease-in-out">
                 {{ msgTranslate?.promotions || 'Promotions' }}</a>
             </li>
@@ -133,7 +133,7 @@
    const { handleOpenPreferences } = useCookieConsent();
 import { ref, onMounted } from 'vue';
 
-import { fetchFooterIcons, fetchFooterText, msgTranslate, loadLang } from '~/composables/globalData.js';
+import { fetchFooterIcons, fetchFooterText, msgTranslate, promotionsLink, loadLang } from '~/composables/globalData.js';
 
 const { fetch, error, $fetchState } = useFetch(async () => {
   try {

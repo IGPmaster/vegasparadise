@@ -12,7 +12,7 @@
             <source media="(min-width: 992px)" :srcset="promo.acf.image_full" :alt="promo.yoast_head_json.description"
               :title="promo.yoast_head_json.og_title">
             <img :src="promo.acf.image_small" class="w-full" :alt="promo.yoast_head_json.description"
-              :title="promo.yoast_head_json.og_title" style="min-width: 100vw; padding-top:6rem;" width="1920"
+              :title="promo.yoast_head_json.og_title" style="padding-top:6rem;" width="1920"
               height="400">
           </picture>
         </a>
